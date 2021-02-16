@@ -1,0 +1,14 @@
+<?php
+
+namespace App\Traits;
+
+trait APIResponse
+{
+    public function response($msg = null, $data = null, $code = 200) {
+        return \response()->json([
+            'status' => in_array($code, [200, 201, 202]) ? 'success' : 'error',
+            'message' => $msg,
+            'data' => $data,
+        ], $code);
+    }
+}
