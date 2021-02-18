@@ -49,6 +49,15 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException) {
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User does not have any of the necessary access rights.',
+                'error' => null,
+            ], 403);
+        }
+        
         return parent::render($request, $exception);
     }
 }

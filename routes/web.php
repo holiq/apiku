@@ -25,4 +25,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->post('login', 'AuthController@login');
         $router->post('logout', 'AuthController@logout');
     });
+    Route::group(['prefix' => 'admin', 'middleware' => ['auth:api', 'role:super-admin|admin']], function () use ($router) {
+        $router->get('/', 'AdminController@index');
+    });
 });
