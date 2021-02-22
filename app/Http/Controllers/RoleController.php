@@ -2,10 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Traits\APIResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
+    use APIResponse;
+    
+    public function __construct()
+    {
+        $this->middleware('role:super-admin');
+    }
+    
     /**
      * Display a listing of the resource.
      *
@@ -13,7 +23,9 @@ class RoleController extends Controller
      */
     public function index()
     {
-        //
+        $role = Role::all();
+        
+        return $this->response('success get roles', $role, 200);
     }
 
     /**
@@ -34,7 +46,27 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|min:4|max:50',
+            'permission' => 'required', 
+        ]);
+        
+        if($validator->fails()){
+            return $this->response(null, $validator->errors(), 422);
+        }
+        
+        try{
+            $role = Role::create([
+                'name' => $request->name,
+            ]);
+            
+            $role->syncPermissions($request->permission);
+            
+            return $this->response("Successfully create role.", $request->all(), 201);
+            
+        }catch(\Exception $e){
+            return $this->response("Failed to create role.", $e, 409);
+        }
     }
 
     /**
@@ -45,7 +77,9 @@ class RoleController extends Controller
      */
     public function show($id)
     {
-        //
+        $role = Role::with('permissions', 'users')->find($id);
+        
+        return $this->response('success get role', $role, 200);
     }
 
     /**
@@ -68,7 +102,28 @@ class RoleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|min:4|max:50',
+            'permission' => 'required', 
+        ]);
+        
+        if($validator->fails()){
+            return $this->response(null, $validator->errors(), 422);
+        }
+        
+        try{
+            $role = Role::findOrFail($id);
+            
+            $role->update([
+                'name' => $request->name,
+            ]);
+            
+            $role->syncPermissions($request->permission);
+            
+            return $this->response("Successfully update role.", $request->all(), 201);
+        }catch(\Exception $e){
+            return $this->response("Failed to update role.", $e, 409);
+        }
     }
 
     /**
@@ -78,7 +133,16 @@ class RoleController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {
-        //
+    {   
+        try{
+            $role = Role::findOrFail($id);
+            
+            $role->delete();
+            
+            return $this->response("Successfully delete role.", null, 201);
+        }catch(\Exception $e){
+            return $this->response("Failed to delete role.", $e, 409);
+        }
+            
     }
 }

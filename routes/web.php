@@ -27,5 +27,29 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     });
     Route::group(['prefix' => 'admin', 'middleware' => ['auth:api', 'role:super-admin|admin']], function () use ($router) {
         $router->get('/', 'AdminController@index');
+        // Permissions route group
+        Route::group(['prefix' => 'permissions'], function () use ($router) {
+            $router->get('/', 'PermissionController@index');
+            $router->post('/', 'PermissionController@store');
+            $router->get('/{id}', 'PermissionController@show');
+            $router->put('/{id}', 'PermissionController@update');
+            $router->delete('/{id}', 'PermissionController@destroy');
+        });
+        // Roles route group
+        Route::group(['prefix' => 'roles'], function () use ($router) {
+            $router->get('/', 'RoleController@index');
+            $router->post('/', 'RoleController@store');
+            $router->get('/{id}', 'RoleController@show');
+            $router->put('/{id}', 'RoleController@update');
+            $router->delete('/{id}', 'RoleController@destroy');
+        });
+        // Users route group
+        Route::group(['prefix' => 'users'], function () use ($router) {
+            $router->get('/', 'UserController@index');
+            $router->post('/', 'UserController@store');
+            $router->get('/{id}', 'UserController@show');
+            $router->put('/{id}', 'UserController@update');
+            $router->delete('/{id}', 'UserController@destroy');
+        });
     });
 });
