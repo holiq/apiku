@@ -13,6 +13,6 @@ class AdminController extends Controller
     
     public function index()
     {
-        return $this->response("welcome ".Auth::user()->name, Auth::user(), 200);
+        return $this->response("Welcome " . Auth::user()->name, Auth::user(), 200);
     }
 }

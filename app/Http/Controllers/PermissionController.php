@@ -10,12 +10,12 @@ use Spatie\Permission\Models\Permission;
 class PermissionController extends Controller
 {
     use APIResponse;
-    
+
     public function __construct()
     {
         $this->middleware('role:super-admin');
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -23,9 +23,9 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        $permission = Permission::all();
-        
-        return $this->response('success get permissions', $permission, 200);
+        $permissions = Permission::all();
+
+        return $this->response("Success get permissions.", $permissions, 200);
     }
 
     /**
@@ -49,18 +49,18 @@ class PermissionController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|min:4|max:50',
         ]);
-        
-        if($validator->fails()){
+
+        if ($validator->fails()) {
             return $this->response(null, $validator->errors(), 422);
         }
-        
-        try{
-            $permission = Permission::create([
+
+        try {
+            Permission::create([
                 'name' => $request->name,
             ]);
-            
+
             return $this->response("Successfully create permission.", $request->all(), 201);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return $this->response("Failed to create permission.", $e, 409);
         }
     }
@@ -74,8 +74,8 @@ class PermissionController extends Controller
     public function show($id)
     {
         $permission = Permission::with('roles')->find($id);
-        
-        return $this->response('success get permission', $permission, 200);
+
+        return $this->response('Success get permission', $permission, 200);
     }
 
     /**
@@ -101,20 +101,20 @@ class PermissionController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|min:4|max:50',
         ]);
-        
-        if($validator->fails()){
+
+        if ($validator->fails()) {
             return $this->response(null, $validator->errors(), 422);
         }
-        
-        try{
+
+        try {
             $permission = Permission::findOrFail($id);
-            
+
             $permission->update([
                 'name' => $request->name,
             ]);
-            
+
             return $this->response("Successfully update permission.", $request->all(), 201);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return $this->response("Failed to update permission.", $e, 409);
         }
     }
@@ -126,16 +126,15 @@ class PermissionController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {   
-        try{
+    {
+        try {
             $permission = Permission::findOrFail($id);
-            
+
             $permission->delete();
-            
+
             return $this->response("Successfully delete permission.", null, 201);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return $this->response("Failed to delete permission.", $e, 409);
         }
-            
     }
 }
